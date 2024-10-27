@@ -90,3 +90,9 @@ desktop.ini
 # Дополнительные файлы
 .env
 *.env
+
+# Исключить папку staticfiles
+staticfiles/
+
+# Исключить системный файл macOS
+.DS_Store
