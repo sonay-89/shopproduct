@@ -9,8 +9,13 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+
 import os
+import dj_database_url
+from datetime import timedelta
 from pathlib import Path
+from dotenv import load_dotenv
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +25,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ml%2qqav)h=ktw27)@oqlk6k87j*^sc5xw#+(4lfzb$hkpi9)='
+load_dotenv()
+
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True # TODO в .env
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [] # TODO в .env, узнать почему хранится в енв
 
 
 # Application definition
@@ -37,7 +44,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ShopProduct',
+    'drf_spectacular',
+    'rest_framework',
+    'django_filters',
+    'rest_framework_simplejwt',
+    'silk',
+    'ShopProduct', # TODO не с заглавной буквы, узнать почему
+    'ShopProduct.products',
+    'ShopProduct.store',
 ]
 
 MIDDLEWARE = [
@@ -48,11 +62,30 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'silk.middleware.SilkyMiddleware',
+
 ]
 
 ROOT_URLCONF = 'ShopProduct.urls'
 
-TEMPLATES = [
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',  # Класс пагинации
+    'PAGE_SIZE': 10,  # Количество элементов на странице по умолчанию
+    'PAGE_SIZE_QUERY_PARAM': 'page_size',  # Позволяет пользователям изменять количество элементов на странице через запрос
+    'MAX_PAGE_SIZE': 100,  # Максимальное количество элементов на странице
+    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework_simplejwt.authentication.JWTAuthentication',),
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.AllowAny',),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
+
+TEMPLATES = [ # TODO кажется это не надо
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
@@ -68,21 +101,17 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'ShopProduct.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
+DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'shopdb',  # Название твоей базы данных
-        'USER': 'sofakamneva',  # Имя пользователя для подключения к базе данных
-        'PASSWORD': '12345',  # Пароль от базы данных
-        'HOST': 'localhost',  # Хост, где находится база данных (обычно localhost)
-        'PORT': '5432',  # Порт, на котором работает PostgreSQL (по умолчанию 5432)
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL', 'sofakamneva:Bamehi20!@localhost:5432/shopdb') # TODO в .env, через databaseUrl
+    )
 }
 
 
@@ -122,19 +151,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'ShopProduct API',
-    'DESCRIPTION': 'API для магазина и продуктов',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'SWAGGER_UI_DIST': 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/',
-    'SWAGGER_UI_FAVICON_HREF': 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/favicon-32x32.png',
-}
+# TODO нет почтового сервиса, нет селери, нет редиса, нет селери бит
+# TODO добавить гитигнор, и выложить на гит.
+# TODO добавить блек, с 120 размером, пройтись по всему проекту
+

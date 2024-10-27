@@ -1,20 +1,11 @@
 from django.db import models
 
-# Create your models here.
+class TimestampedModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)  # Автоматически заполняется при создании объекта
+    updated_at = models.DateTimeField(auto_now=True)  # Автоматически обновляется при каждом сохранении объекта
 
-class Shop(models.Model):
-    name = models.CharField(max_length=100)
-    number= models.IntegerField()
-
-    def __str__(self):
-        return self.name
+    class Meta:
+        abstract = True
 
 
-class Product(models.Model):
-    name = models.CharField(max_length=100)
-    price = models.IntegerField()
-    quantity = models.IntegerField()
 
-
-    def __str__(self):
-        return self.name
