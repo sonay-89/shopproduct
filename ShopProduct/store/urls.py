@@ -9,3 +9,4 @@ urlpatterns = [
 ]
 
 # example Это изменения Сони
+# example (тут изменения)
