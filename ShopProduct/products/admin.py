@@ -2,15 +2,13 @@
 from django.contrib import admin
 from .models import Product, StoreProductCount
 
-
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'price',)  # Укажите, какие поля отображать
-    search_fields = ('name',)       # Добавьте поле для поиска
-    # list_filter = ('store',)
-# Register your models here.
-
+    list_display = ('id', 'product_name', 'price',)  # Укажите, какие поля отображать
+    search_fields = ('product_name',)       # Добавьте поле для поиска
 
 class StoreProductCountInline(admin.TabularInline):
     model = StoreProductCount
-    extra = 1
+    fields = ('product_name', 'store_name', 'count', 'owner', 'store_price')  # Используем метод для отображения цены
+    readonly_fields = ('store_price',)
+
