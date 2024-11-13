@@ -1,10 +1,11 @@
 from django.contrib.auth.models import User
 from drf_spectacular.utils import extend_schema
-from rest_framework import generics, status
-from rest_framework.permissions import IsAdminUser
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from tutorial.quickstart.serializers import UserSerializer
+
 from ShopProduct.user.serializers import UserRegistrationSerializer
 
 
@@ -14,25 +15,20 @@ from ShopProduct.user.serializers import UserRegistrationSerializer
 )
 class UserInfoView(APIView):
     queryset = User.objects.all()
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]  # Только авторизованные пользователи могут видеть информацию
+
 
     def get(self, request):
-        # Получаем всех пользователей
-        users = User.objects.all()
-
-        # Формируем список данных о пользователях
-        user_data = [
-            {
-                "username": user.username,
-                "email": user.email,
-                # Можно добавить любые другие поля, которые вам нужны
-            }
-            for user in users
-        ]
-        # Возвращаем список пользователей в виде JSON
-        return Response(user_data, status=status.HTTP_200_OK)
+        user = request.user
+        # Возвращаем данные, относящиеся к пользователю
+        return Response({
+            "username": user.username,
+            "email": user.email,
+            # Любая другая информация о пользователе
+        })
 
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
+    permission_classes = [IsAuthenticated] # Разрешаем всем доступ к регистрации
     serializer_class = UserRegistrationSerializer
