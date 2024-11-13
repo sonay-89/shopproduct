@@ -9,37 +9,44 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('store', '0001_initial'),
+        ("store", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Product',
+            name="Product",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('product_name', models.CharField(max_length=100)),
-                ('price', models.DecimalField(decimal_places=2, max_digits=20)),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("product_name", models.CharField(max_length=100)),
+                ("price", models.DecimalField(decimal_places=2, max_digits=20)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='StoreProductCount',
+            name="StoreProductCount",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('product_name', models.CharField(max_length=255)),
-                ('count', models.PositiveIntegerField()),
-                ('store_name', models.CharField(max_length=255)),
-                ('owner', models.CharField(max_length=255)),
-                ('store', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='store_product_counts_store', to='store.store')),
+                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("product_name", models.CharField(max_length=255)),
+                ("count", models.PositiveIntegerField()),
+                ("store_name", models.CharField(max_length=255)),
+                ("owner", models.CharField(max_length=255)),
+                (
+                    "store",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="store_product_counts_store",
+                        to="store.store",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

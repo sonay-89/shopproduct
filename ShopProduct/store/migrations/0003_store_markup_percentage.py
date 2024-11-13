@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('store', '0002_remove_store_owner'),
+        ("store", "0002_remove_store_owner"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='store',
-            name='markup_percentage',
+            model_name="store",
+            name="markup_percentage",
             field=models.DecimalField(decimal_places=2, default=0, max_digits=5),
         ),
     ]
