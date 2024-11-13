@@ -10,6 +10,5 @@ class Store(TimestampedModel):
     markup_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     owner = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True, blank=True)
 
-  # TODO сюда надо добавить юзера, и при создании магазина необходимо сюда прописывать поле этого юзера(брать из реквеста/jwt токена)
     def __str__(self):
         return self.store_name
