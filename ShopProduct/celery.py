@@ -1,21 +1,19 @@
 from __future__ import absolute_import, unicode_literals
 import os
-
 from celery import Celery
+from django.conf import settings
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "shopproduct.settings")
 
 app = Celery("shopproduct")
+
+# Загружает конфигурацию Celery из настроек Django
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
-# Load task modules from all registered Django app configs.
-app.autodiscover_tasks()
+# Автоматически находит задачи в приложении
+app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 
 @app.task(bind=True)
 def debug_task(self):
     print(f"Request: {self.request!r}")
-
-
-def shared_task():
-    return None

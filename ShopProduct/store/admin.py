@@ -17,7 +17,7 @@ class StoreAdmin(admin.ModelAdmin):
     get_products.short_description = "Products"
 
 
-class StoreProductCountInline(admin.TabularInline):
+class StoreProductCountInline(admin.TabularInline):  # TODO ты его неиспользуешь
     model = StoreProductCount
     fields = ("product", "get_price", "count", "owner")  # Используем метод для отображения цены
     readonly_fields = ("get_price",)  # Цена будет подтягиваться автоматически
