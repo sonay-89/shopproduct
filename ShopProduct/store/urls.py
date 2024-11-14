@@ -1,12 +1,8 @@
-
 from django.urls import path, include
 
-from ShopProduct.store.views import StoreCreateListView
+from shopproduct.store.views import StoreCreateListView, StoreDetailUpdateDeleteView
 
 urlpatterns = [
-    path('', StoreCreateListView.as_view(), name='store-list'), # TODO следи за неймингом
-    # TODO добавить еще маршрут, для аптейда, удаления, чтения конкретного магазина. Это магазин должен быть доступен только для юзера, если он его создал.
+    path("", StoreCreateListView.as_view(), name="store-list"),
+    path("<int:pk>/", StoreDetailUpdateDeleteView.as_view(), name="store-detail"),
 ]
-
-# example Это изменения Сони
-# example (тут изменения)
