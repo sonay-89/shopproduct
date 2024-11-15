@@ -8,7 +8,7 @@ from tutorial.quickstart.serializers import UserSerializer
 from shopproduct.user.serializers import UserRegistrationSerializer
 
 
-@extend_schema(
+@extend_schema( # TODO используй свой сериалайзер
     request=UserSerializer,  # Описываем, какой сериалайзер используется для входящих данных (запрос)
     responses={200: UserSerializer, 201: UserSerializer},  # Описываем, какой сериалайзер используется для ответа
 )

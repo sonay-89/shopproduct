@@ -11,3 +11,5 @@ def send_regular_email():
         ["aloy02102024@gmail.com"],
         fail_silently=False,
     )
+
+# TODO добавить задачу отправки письма через селери, когда юзер зарегестрировался

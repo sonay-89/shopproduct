@@ -20,11 +20,6 @@ class StoreCreateListView(ListCreateAPIView):
     filterset_fields = ["owner", "store_name", "created_at", "updated_at"]
     ordering_fields = ["store_name", "id"]  # Позволяет сортировать по этим полям
 
-    @extend_schema(
-        summary="Get list of stores",
-        description="Retrieve a list of stores, with optional filtering and ordering",
-        responses={200: StoreBaseSerializer(many=True)},
-    )
     def get(self, request, *args, **kwargs):
         user = request.user
         store_user = Store.objects.filter(owner=user)
@@ -32,16 +27,13 @@ class StoreCreateListView(ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class StoreProductCountDetailView(APIView):
+class StoreProductCountDeleteUpdateDetailView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = StoreProductBaseSerializer  # Явно указываем serializer_class для генерации документации
 
     def get_serializer(self, *args, **kwargs):
         return self.serializer_class(*args, **kwargs)
 
-    @extend_schema(  # Добавляем схему с помощью drf-spectacular
-        summary="Получение информации о количестве продукта в магазине",
-    )
     def get(self, request, *args, **kwargs):
         user = request.user
         store_product_counts = StoreProductCount.objects.filter(

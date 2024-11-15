@@ -4,6 +4,7 @@ from shopproduct.store.models import Store
 
 
 class StoreBaseSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
 
     class Meta:
         model = Store
