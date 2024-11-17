@@ -7,7 +7,7 @@ class ProductBaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ["id", "product_name", "price"]  # Указываем, что 'id' — это ID продукта
-        extra_kwargs = {"id": {"lfabel": "Product ID"}}  # Чтобы было явно понятно, что это ID
+        extra_kwargs = {"id": {"label": "Product ID"}}  # Чтобы было явно понятно, что это ID
 
 
 class ProductDetailSerializer(ProductBaseSerializer):

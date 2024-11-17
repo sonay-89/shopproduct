@@ -12,4 +12,18 @@ def send_regular_email():
         fail_silently=False,
     )
 
-# TODO добавить задачу отправки письма через селери, когда юзер зарегестрировался
+from celery import shared_task
+from django.core.mail import send_mail
+
+
+@shared_task
+def send_welcome_email(user_email, username):
+    """
+    Отправка приветственного письма новому пользователю.
+    """
+    subject = "Добро пожаловать!"
+    message = f"Привет, {username}! Спасибо за регистрацию на нашем сайте."
+    from_email = "noreply@yourdomain.com"
+    recipient_list = [user_email]
+
+    send_mail(subject, message, from_email, recipient_list)
