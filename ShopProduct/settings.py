@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-ALLOWED_HOSTS = ["*"]  # TODO разобраться как правильно тут и в .env
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 DEBUG = True
 
 
