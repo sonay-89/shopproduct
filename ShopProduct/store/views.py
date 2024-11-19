@@ -27,7 +27,7 @@ class StoreCreateListView(ListCreateAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class StoreProductCountDeleteUpdateDetailView(APIView):
+class StoreProductCountDetailUpdateDeleteView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = StoreProductBaseSerializer  # Явно указываем serializer_class для генерации документации
 
