@@ -4,10 +4,11 @@ from shopproduct.store.models import Store
 
 
 class StoreBaseSerializer(serializers.ModelSerializer):
+    owner_username = serializers.ReadOnlyField(source='owner.username')
 
     class Meta:
         model = Store
-        fields = ["id", "store_name", "markup_percentage", "owner"]  # Указываем 'id' как ID магазина
+        fields = ["id", "store_name", "markup_percentage", "owner_username"]  # Указываем 'id' как ID магазина
 
 
 class StoreDetailSerializer(StoreBaseSerializer):

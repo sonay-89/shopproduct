@@ -4,13 +4,13 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from tutorial.quickstart.serializers import UserSerializer
-from shopproduct.user.serializers import UserRegistrationSerializer
+from shopproduct.tasks import send_welcome_email  # Импорт задачи
+from shopproduct.user.serializers import UserRegistrationSerializer, UserBaseSerializer
 
 
 @extend_schema(
-    request=UserSerializer,  # Описываем, какой сериалайзер используется для входящих данных (запрос)
-    responses={200: UserSerializer, 201: UserSerializer},  # Описываем, какой сериалайзер используется для ответа
+    request=UserBaseSerializer,  # Описываем, какой сериалайзер используется для входящих данных (запрос)
+    responses={200: UserBaseSerializer, 201: UserBaseSerializer},  # Описываем, какой сериалайзер используется для ответа
 )
 class UserInfoView(APIView):
     queryset = User.objects.all()
@@ -36,3 +36,9 @@ class UserInfoView(APIView):
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegistrationSerializer
+
+    def perform_create(self, serializer):
+        # Создаём пользователя
+        user = serializer.save()
+        # Отправляем задачу для приветственного письма
+        send_welcome_email.delay(user.email, user.username)
