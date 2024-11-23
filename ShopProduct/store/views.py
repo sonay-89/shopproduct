@@ -29,47 +29,18 @@ class StoreCreateListView(ListCreateAPIView):
 
 class StoreProductCountDetailUpdateDeleteView(APIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = StoreProductBaseSerializer  # Явно указываем serializer_class для генерации документации
+    serializer_class = StoreProductBaseSerializer
 
     def get_serializer(self, *args, **kwargs):
         return self.serializer_class(*args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
-        user = request.user
-        store_product_counts = StoreProductCount.objects.filter(
-            owner=user
-        )  # Используем filter() для получения всех объектов
-        serializer = self.get_serializer(store_product_counts, many=True)
+    def get(self, request, id, *args, **kwargs):
+        store_product_count = get_object_or_404(StoreProductCount, id=id, owner=request.user)
+        serializer = self.get_serializer(store_product_count)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request, *args, **kwargs):
-        # Получаем данные из запроса
-        serializer = StoreProductBaseSerializer(data=request.data)
-
-        if serializer.is_valid():
-
-            product_name_str = serializer.validated_data["product_name"]
-            store_name_str = serializer.validated_data["store_name"]
-
-            product = get_object_or_404(Product, product_name=product_name_str)
-            store = get_object_or_404(Store, store_name=store_name_str)
-
-            # Создаем новую запись с добавлением пользователя
-            store_product_count = StoreProductCount.objects.create(
-                product_name=product,  # Передаем объект Product
-                store_name=store,  # Передаем объект Store
-                count=serializer.validated_data["count"],
-                owner=request.user,
-            )
-
-            # Возвращаем успешный ответ с созданной записью
-            response_serializer = StoreProductBaseSerializer(store_product_count)
-            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     def put(self, request, id, *args, **kwargs):
-        store_product_count = get_object_or_404(StoreProductCount, id=id, username=request.user)
+        store_product_count = get_object_or_404(StoreProductCount, id=id, owner=request.user)
         serializer = self.get_serializer(store_product_count, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -77,7 +48,7 @@ class StoreProductCountDetailUpdateDeleteView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, id, *args, **kwargs):
-        store_product_count = get_object_or_404(StoreProductCount, id=id, username=request.user)
+        store_product_count = get_object_or_404(StoreProductCount, id=id, owner=request.user)
         serializer = self.get_serializer(store_product_count, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -85,9 +56,47 @@ class StoreProductCountDetailUpdateDeleteView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, id, *args, **kwargs):
-        store_product_count = get_object_or_404(StoreProductCount, id=id, username=request.user)
+        store_product_count = get_object_or_404(StoreProductCount, id=id, owner=request.user)
         store_product_count.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class StoreProductCountListCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = StoreProductBaseSerializer
+
+    def get_serializer(self, *args, **kwargs):
+        return self.serializer_class(*args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        store_product_counts = StoreProductCount.objects.filter(owner=request.user)
+        serializer = self.get_serializer(store_product_counts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            product_name_str = serializer.validated_data["product_name"]
+            store_name_str = serializer.validated_data["store_name"]
+
+            product = get_object_or_404(Product, product_name=product_name_str)
+            store = get_object_or_404(Store, store_name=store_name_str)
+
+            # Валидация: один пользователь не может иметь более 5 товаров в магазине
+            if StoreProductCount.objects.filter(owner=request.user, store_name=store).count() >= 5:
+                return Response({"error": "You can't have more than 5 products in a store."},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            store_product_count = StoreProductCount.objects.create(
+                product_name=product,
+                store_name=store,
+                count=serializer.validated_data["count"],
+                owner=request.user,
+            )
+            response_serializer = self.get_serializer(store_product_count)
+            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class StoreDetailUpdateDeleteView(RetrieveUpdateDestroyAPIView):
