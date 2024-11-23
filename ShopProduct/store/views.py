@@ -1,5 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
@@ -8,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .models import Store
 from .serializers import StoreBaseSerializer, StoreDetailSerializer
+from .. import settings
 from ..products.models import StoreProductCount, Product
 from ..products.serializers import StoreProductBaseSerializer
 
@@ -26,7 +28,11 @@ class StoreCreateListView(ListCreateAPIView):
         serializer = self.get_serializer(store_user, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
+@extend_schema(
+    request=StoreProductBaseSerializer,  # Описываем входящие данные (POST/PUT)
+    responses={200: StoreProductBaseSerializer, 201: StoreProductBaseSerializer},  # Описываем возможные ответы
+    description="Endpoint to create, retrieve, update, and delete store product count.",
+)
 class StoreProductCountDetailUpdateDeleteView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = StoreProductBaseSerializer
@@ -60,7 +66,11 @@ class StoreProductCountDetailUpdateDeleteView(APIView):
         store_product_count.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
+@extend_schema(
+    request=StoreProductBaseSerializer,  # Описываем входящие данные (POST/PUT)
+    responses={200: StoreProductBaseSerializer, 201: StoreProductBaseSerializer},  # Описываем возможные ответы
+    description="Endpoint to create, retrieve, update, and delete store product count.",
+)
 class StoreProductCountListCreateView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = StoreProductBaseSerializer
@@ -76,16 +86,15 @@ class StoreProductCountListCreateView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            product_name_str = serializer.validated_data["product_name"]
-            store_name_str = serializer.validated_data["store_name"]
+            product_name = serializer.validated_data["product_name"]
+            store_name = serializer.validated_data["store_name"]
 
-            product = get_object_or_404(Product, product_name=product_name_str)
-            store = get_object_or_404(Store, store_name=store_name_str)
+            product = get_object_or_404(Product, product_name=product_name)
+            store = get_object_or_404(Store, store_name=store_name)
 
             # Валидация: один пользователь не может иметь более 5 товаров в магазине
             if StoreProductCount.objects.filter(owner=request.user, store_name=store).count() >= 5:
-                return Response({"error": "You can't have more than 5 products in a store."},
-                                status=status.HTTP_400_BAD_REQUEST)
+                raise ValidationError(detail="You can't have more than 5 products in a store.")
 
             store_product_count = StoreProductCount.objects.create(
                 product_name=product,
