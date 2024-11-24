@@ -1,6 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
@@ -92,13 +91,14 @@ class StoreProductCountListCreateView(APIView):
             product = get_object_or_404(Product, product_name=product_name)
             store = get_object_or_404(Store, store_name=store_name)
 
-            # Валидация: один пользователь не может иметь более 5 товаров в магазине
-            if StoreProductCount.objects.filter(owner=request.user, store_name=store).count() >= 5:
-                raise ValidationError(detail="You can't have more than 5 products in a store.")
+            MAX_PRODUCTS_PER_OWNER = getattr(settings, 'MAX_PRODUCTS_PER_OWNER', 5)
+            if StoreProductCount.objects.filter(owner=request.user, store_name=store).count() >= MAX_PRODUCTS_PER_OWNER:
+                return Response({"detail": "You can't have more than 5 products in a store."},
+                                status=status.HTTP_400_BAD_REQUEST)
 
             store_product_count = StoreProductCount.objects.create(
-                product_name=product,
-                store_name=store,
+                product=product,
+                store=store,
                 count=serializer.validated_data["count"],
                 owner=request.user,
             )

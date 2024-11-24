@@ -20,7 +20,7 @@ urlpatterns = [
     path("api/schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     path("products/", include("shopproduct.products.urls")),
     path("stores/", include("shopproduct.store.urls")),
-    path('store-product-counts-detail/<int:id>/', StoreProductCountDetailUpdateDeleteView.as_view(), name='store-product-detail'),
+    path('store-product-counts-detail/<int:id>/', StoreProductCountDetailUpdateDeleteView.as_view(), name='store-product-detail-update-delete'),
     path('store-product-counts/', StoreProductCountListCreateView.as_view(), name='store-product-list-create'),
     path("register/", RegisterView.as_view(), name="register"),
 ]
