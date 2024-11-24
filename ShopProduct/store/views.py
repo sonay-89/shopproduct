@@ -1,5 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
@@ -11,6 +12,7 @@ from .serializers import StoreBaseSerializer, StoreDetailSerializer
 from .. import settings
 from ..products.models import StoreProductCount, Product
 from ..products.serializers import StoreProductBaseSerializer
+from ..settings import MAX_PRODUCTS_PER_OWNER
 
 
 class StoreCreateListView(ListCreateAPIView):
@@ -91,10 +93,9 @@ class StoreProductCountListCreateView(APIView):
             product = get_object_or_404(Product, product_name=product_name)
             store = get_object_or_404(Store, store_name=store_name)
 
-            MAX_PRODUCTS_PER_OWNER = getattr(settings, 'MAX_PRODUCTS_PER_OWNER', 5)
             if StoreProductCount.objects.filter(owner=request.user, store_name=store).count() >= MAX_PRODUCTS_PER_OWNER:
-                return Response({"detail": "You can't have more than 5 products in a store."},
-                                status=status.HTTP_400_BAD_REQUEST)
+                raise ValidationError("You can't have more than {} products in a store.".format(MAX_PRODUCTS_PER_OWNER))
+
 
             store_product_count = StoreProductCount.objects.create(
                 product=product,
