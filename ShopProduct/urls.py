@@ -7,7 +7,7 @@ from rest_framework_simplejwt.views import (
 )
 from django.urls import path
 
-from shopproduct.store.views import StoreProductCountDetailUpdateDeleteView
+from shopproduct.store.views import StoreProductCountDetailUpdateDeleteView, StoreProductCountListCreateView
 from shopproduct.user.views import RegisterView
 
 urlpatterns = [
@@ -20,7 +20,7 @@ urlpatterns = [
     path("api/schema/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
     path("products/", include("shopproduct.products.urls")),
     path("stores/", include("shopproduct.store.urls")),
-    path("store-product-counts/", StoreProductCountDetailUpdateDeleteView.as_view(), name="storeproductcount-list"),  #
-    # Маршрут для детального просмотра, обновления и удаления по ID
+    path('store-product-counts-detail/<int:id>/', StoreProductCountDetailUpdateDeleteView.as_view(), name='store-product-detail-update-delete'),
+    path('store-product-counts/', StoreProductCountListCreateView.as_view(), name='store-product-list-create'),
     path("register/", RegisterView.as_view(), name="register"),
 ]

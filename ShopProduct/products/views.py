@@ -1,5 +1,4 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import ListCreateAPIView
 from .models import Product

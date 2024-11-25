@@ -16,9 +16,9 @@ class ProductDetailSerializer(ProductBaseSerializer):
 
 
 class StoreProductBaseSerializer(serializers.ModelSerializer):
-    store_name = serializers.CharField()
-    product_name = serializers.CharField()
+    store = serializers.CharField()
+    product = serializers.CharField()
 
     class Meta:
         model = StoreProductCount
-        fields = ["store_name", "count", "product_name", "store_price"]
+        fields = ["store", "count", "product", "store_price"]
