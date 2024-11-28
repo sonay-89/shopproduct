@@ -10,6 +10,10 @@ class StoreBaseSerializer(serializers.ModelSerializer):
         model = Store
         fields = ["id", "store_name", "markup_percentage", "owner_username"]  # Указываем 'id' как ID магазина
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['markup_percentage'] = float(data['markup_percentage'])  # Преобразуем в число
+        return data
 
 class StoreDetailSerializer(StoreBaseSerializer):
 
