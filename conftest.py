@@ -10,8 +10,9 @@ def test_user(db):
     return User.objects.create_user(username="test_user", password="password")
 
 @pytest.fixture
-def store(test_user):
-    return Store.objects.create(store_name="Test Store", owner=test_user)
+def store(db):
+    # Создаёт магазин для использования в тестах
+    return Store.objects.create(store_name="Test Store", markup_percentage=10)
 
 @pytest.fixture
 def fixed_datetime():
@@ -26,3 +27,22 @@ def api_client(db):
     success = client.login(username="testuser", password="password")
     assert success, "Login failed"
     return client
+
+@pytest.fixture
+def owner_1(db):
+    return User.objects.create_user(username="owner1", password="password")
+
+@pytest.fixture
+def owner_2(db):
+    return User.objects.create_user(username="owner2", password="password")
+
+@pytest.fixture
+def stores_for_owner_1(db, owner_1):
+    return [Store.objects.create(store_name=f"Store_{i}", markup_percentage=10, owner=owner_1) for i in range(7)]
+
+@pytest.fixture
+def stores_for_owner_2(db, owner_2):
+    return [Store.objects.create(store_name=f"Store_{i + 7}", markup_percentage=15, owner=owner_2) for i in range(6)]
+
+
+
