@@ -1,6 +1,7 @@
 import pytest
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from shopproduct.store.models import Store
 from datetime import datetime, timezone
@@ -28,9 +29,23 @@ def api_client(db):
     assert success, "Login failed"
     return client
 
+
+@pytest.fixture
+def api_client_with_token(owner_1):
+    client = APIClient()
+
+    # Генерируем JWT-токен
+    refresh = RefreshToken.for_user(owner_1)
+    token = str(refresh.access_token)
+
+
+    # Устанавливаем токен в заголовок Authorization
+    client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+    return client
+
 @pytest.fixture
 def owner_1(db):
-    return User.objects.create_user(username="owner1", password="password")
+    return User.objects.create_user(username="owner1", password="password1")
 
 @pytest.fixture
 def owner_2(db):
