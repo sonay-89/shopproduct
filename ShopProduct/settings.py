@@ -53,6 +53,8 @@ REST_FRAMEWORK = {
     "PAGE_SIZE_QUERY_PARAM": "page_size",  # Позволяет пользователям изменять количество элементов на странице через запрос
     "MAX_PAGE_SIZE": 100,  # Максимальное количество элементов на странице
     "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
+
 }
 
 

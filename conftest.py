@@ -1,14 +1,28 @@
 import pytest
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
-from rest_framework_simplejwt.tokens import RefreshToken
-
 from shopproduct.store.models import Store
 from datetime import datetime, timezone
 
 @pytest.fixture
 def test_user(db):
     return User.objects.create_user(username="test_user", password="password")
+
+@pytest.fixture
+def owner_1(django_user_model):
+    return django_user_model.objects.create_user(
+        username="owner1",
+        email="owner2@example.com",
+        password="password123"
+    )
+
+@pytest.fixture
+def owner_2(django_user_model):
+    return django_user_model.objects.create_user(
+        username="owner2",
+        email="owner2@example.com",
+        password="password123"
+    )
 
 @pytest.fixture
 def store(db):
@@ -21,35 +35,11 @@ def fixed_datetime():
 
 
 @pytest.fixture
-def api_client(db):
-    user = User.objects.create_user(username="testuser", password="password")
-    assert User.objects.filter(username="testuser").exists(), "User not created"
-    client = APIClient()
-    success = client.login(username="testuser", password="password")
-    assert success, "Login failed"
-    return client
-
-
-@pytest.fixture
 def api_client_with_token(owner_1):
     client = APIClient()
-
-    # Генерируем JWT-токен
-    refresh = RefreshToken.for_user(owner_1)
-    token = str(refresh.access_token)
-
-
-    # Устанавливаем токен в заголовок Authorization
-    client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+    client.force_authenticate(user=owner_1)  # Авторизуем клиента под user_1
     return client
 
-@pytest.fixture
-def owner_1(db):
-    return User.objects.create_user(username="owner1", password="password1")
-
-@pytest.fixture
-def owner_2(db):
-    return User.objects.create_user(username="owner2", password="password")
 
 @pytest.fixture
 def stores_for_owner_1(db, owner_1):

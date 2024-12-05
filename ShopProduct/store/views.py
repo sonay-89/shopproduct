@@ -1,6 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
@@ -109,6 +109,7 @@ class StoreProductCountListCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class StoreDetailUpdateDeleteView(RetrieveUpdateDestroyAPIView):
     queryset = Store.objects.all()
     serializer_class = StoreDetailSerializer
@@ -116,5 +117,9 @@ class StoreDetailUpdateDeleteView(RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        # Возвращаем только те магазины, которые принадлежат текущему пользователю
-        return Store.objects.filter(owner=user)
+        queryset = Store.objects.filter(owner=user)
+
+        # Если магазин не найден, вызываем исключение NotFound
+        if not queryset.exists():
+            raise NotFound(detail="Not found.")
+        return queryset
