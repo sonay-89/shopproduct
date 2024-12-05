@@ -54,6 +54,7 @@ REST_FRAMEWORK = {
     "MAX_PAGE_SIZE": 100,  # Максимальное количество элементов на странице
     "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
+
 }
 
 
@@ -137,3 +138,9 @@ CELERY_TASK_SERIALIZER = "json"
 
 
 MAX_PRODUCTS_PER_OWNER = 5
+
+
+DATABASES['default']['TEST'] = {
+    'NAME': 'test_shopdb',  # Название тестовой базы данных
+}
+
