@@ -4,4 +4,5 @@ from shopproduct.store.views import StoreCreateListView, StoreDetailUpdateDelete
 
 urlpatterns = [
     path("", StoreCreateListView.as_view(), name="store-create-list"),
+    path("<int:pk>/", StoreDetailUpdateDeleteView.as_view(), name="store-update-delete"),
 ]
